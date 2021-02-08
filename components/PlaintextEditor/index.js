@@ -1,14 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import TextareaAutosize from 'react-autosize-textarea';
 
 import css from './style.css';
 
-function PlaintextEditor({ file, write }) {
-  console.log(file, write);
+
+const PlaintextEditor = ({ file, write }) => {
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      if (file) {
+        setValue(await file.text());
+      }
+    })()
+  }, [file]);
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+
+    write(new File(
+      [
+        event.target.value
+      ],
+      file.name,
+      {
+        type: file.type,
+        lastModified: Date.now()
+      }
+    ))
+  }
+
   return (
     <div className={css.editor}>
-      <h3>TODO</h3>
-      <i>text/plain</i>
+      <TextareaAutosize
+        value={value}
+        onChange={handleChange}
+        className={css.editor}
+      />
     </div>
   );
 }
